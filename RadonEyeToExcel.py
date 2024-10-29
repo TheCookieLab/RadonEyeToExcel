@@ -23,16 +23,20 @@ end_datetime = datetime.strptime(end_datetime_str, '%Y%m%d %H%M%S')
 with open(input_file, 'r') as file:
     lines = file.readlines()
 
-# Extract the Data No (number of readings) and the unit from the header
+# Extract the Data No (number of readings), the unit, and the time step from the header
 unit = ""
+time_step_hours = 1
 for line in lines:
     if line.startswith("Data No:"):
         num_readings = int(line.split(":")[1].strip())
     elif line.startswith("Unit:"):
         unit = line.split(":")[1].strip()
+    elif line.startswith("Time step:"):
+        time_step_str = line.split(":")[1].strip()
+        time_step_hours = int(re.search(r'(\d+)', time_step_str).group(1))
 
-# Calculate the start date and time based on the end date and number of readings
-start_datetime = end_datetime - timedelta(hours=(num_readings - 1))
+# Calculate the start date and time based on the end date, number of readings, and time step
+start_datetime = end_datetime - timedelta(hours=(num_readings - 1) * time_step_hours)
 
 # Extract the radon readings from the file
 readings = []
@@ -42,7 +46,7 @@ for line in lines:
         readings.append(float(match.group(1)))
 
 # Generate date/time stamps for each reading
-date_times = [start_datetime + timedelta(hours=i) for i in range(len(readings))]
+date_times = [start_datetime + timedelta(hours=i * time_step_hours) for i in range(len(readings))]
 
 # Create a DataFrame with Date/Time and Radon Level columns
 df = pd.DataFrame({
