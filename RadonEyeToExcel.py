@@ -64,7 +64,11 @@ end_datetime_str = end_datetime.strftime('%m.%d.%Y %H-%M-%S')
 output_file = os.path.join(output_dir, f'RadonEye Readings {start_datetime_str} to {end_datetime_str}.xlsx')
 
 # Output the DataFrame to an Excel file using openpyxl
-df.to_excel(output_file, index=False, engine='openpyxl')
+try:
+    df.to_excel(output_file, index=False, engine='openpyxl')
+except PermissionError:
+    print(f"{output_file} already exists and cannot be overwritten.")
+    exit()
 
 # Adjust column widths in the Excel file
 wb = openpyxl.load_workbook(output_file)
