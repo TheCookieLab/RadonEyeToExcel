@@ -12,6 +12,10 @@ root = tk.Tk()
 root.withdraw()
 input_file = filedialog.askopenfilename(title="Select RadonEye log file", filetypes=[("Text files", "*.txt")])
 
+if not input_file:
+    print("No RadonEye log file selected.")
+    exit()
+
 # Create a directory selection UI for output
 output_dir = filedialog.askdirectory(title="Select Output Directory")
 
